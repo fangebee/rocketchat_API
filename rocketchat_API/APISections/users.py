@@ -83,8 +83,26 @@ class RocketChatUsers(RocketChatBase):
             )
         return response
 
-    def users_set_avatar(self, avatar_url, **kwargs):
+    def users_set_avatar(self, avatar_url, user_id=None, username=None, **kwargs):
         """Set a user's avatar"""
+
+        if isinstance(avatar_url, bytes):
+            avatar_file = {"image": ("avatar", avatar_url, "image/x-unknown")}
+            if user_id:
+                return self.call_api_post(
+                    "users.setAvatar",
+                    files=avatar_file,
+                    userId=user_id,
+                    kwargs=kwargs,
+                )
+            if username:
+                return self.call_api_post(
+                    "users.setAvatar",
+                    files=avatar_file,
+                    username=username,
+                    kwargs=kwargs,
+                )
+
         if avatar_url.startswith("http://") or avatar_url.startswith("https://"):
             return self.call_api_post(
                 "users.setAvatar", avatarUrl=avatar_url, kwargs=kwargs
